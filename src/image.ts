@@ -8,11 +8,10 @@ export default async (data: CoverageData) => {
     const svg = baseSvg
         .replace('${missing}', data.coverage.mutantMissing.toString())
         .replace('${satisfied}', data.coverage.mutantSatisfied.toString())
-        .replace('${progress}', data.coverage.satisfiedPercentage.toString())
+        .replace('${progress}', (data.coverage.satisfiedPercentage * 1.95).toString())
 
     mkdirSync('./out', { recursive: true })
     writeFileSync('./out/coverage.svg', svg)
 
     logger.done('Wrote svg to ./out/coverage.svg')
-    logger.warn('png is wip!')
 }
