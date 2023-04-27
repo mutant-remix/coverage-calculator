@@ -15,11 +15,11 @@ JSON.parse(files.unicode).forEach((unicodeGroup: UnicodeGroup) => {
 
     unicodeGroup.emoji.forEach((emoji: UnicodeEmoji) => {
         const item: Emoji = {
-            codepoint: emoji.base[0],
+            codepoint: emoji.base.map(chunk => chunk.toString(16).padStart(4, '0')).join('-'),
             shortcodes: emoji.shortcodes,
             emoticons: emoji.emoticons,
-            alternates: emoji.alternates,
-            mutantNames: null
+            alternates: emoji.alternates.map(alternate => alternate.map(chunk => chunk.toString(16).padStart(4, '0')).join('-')),
+            mutant: null
         }
 
         group.push(item)
@@ -29,32 +29,41 @@ JSON.parse(files.unicode).forEach((unicodeGroup: UnicodeGroup) => {
 })
 
 // Parse mutantRemix data
-let mutantRemix = new Map()
-
-interface MutantEmoji {
-    code: number[],
-    src: string
+interface MutantEmojiJson {
+    code: number[] | string,
+    src: string,
+    short: string,
 }
 
-JSON.parse(files.mutantRemix).forEach((emoji: MutantEmoji) => {
-    [ ...emoji.code ].forEach(code => {
-        const name = emoji.src.split('/').pop()?.replace('.svg', '')
+interface MutantEmoji {
+    shortcode: string,
+    src: string,
+}
 
-        if (mutantRemix.has(code)) {
-            const item = mutantRemix.get(code)
-            if (!item.includes(name)) item.push(name)
-            mutantRemix.set(code, item)
-        } else {
-            mutantRemix.set(code, [ name ])
-        }
+let mutantRemix: Map<string, MutantEmoji> = new Map()
+
+for (const emojiJson of JSON.parse(files.mutantRemix)) {
+    const emoji = emojiJson as MutantEmojiJson
+    if (typeof emoji.code == 'string') continue;
+
+    const code = emoji.code.map(chunk => chunk.toString(16).padStart(4, '0')).join('-')
+
+    mutantRemix.set(code, {
+        shortcode: emoji.short,
+        src: emoji.src
     })
-})
+}
 
 // Merge data
 for (const [ group, emojis ] of groups) {
     for (const emoji of emojis) {
-        if (mutantRemix.has(emoji.codepoint)) {
-            emoji.mutantNames = mutantRemix.get(emoji.codepoint)
+        const mutant = mutantRemix.get(emoji.codepoint)
+
+        if (mutant) {
+            emoji.mutant = {
+                src: mutant.src,
+                shortcode: mutant.shortcode,
+            }
         }
     }
 }
@@ -63,7 +72,7 @@ for (const [ group, emojis ] of groups) {
 const unicodeTotal = Array.from(groups)
     .reduce((total, group) => total + group[1].length, 0)
 const mutantUnicodeOverlap = Array.from(groups)
-    .reduce((total, group) => total + group[1].filter(emoji => emoji.mutantNames).length, 0)
+    .reduce((total, group) => total + group[1].filter(emoji => emoji.mutant).length, 0)
 
 export default {
     groups: groups,

@@ -1,9 +1,12 @@
 export interface Emoji {
-    codepoint: number,
-    alternates: number[][],
+    codepoint: string,
+    alternates: string[],
     shortcodes: string[],
     emoticons: string[],
-    mutantNames: string[] | null,
+    mutant: {
+        src: string,
+        shortcode: string,
+    } | null,
 }
 
 export interface UnicodeEmoji {

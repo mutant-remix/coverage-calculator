@@ -15,17 +15,15 @@ export default (data: Map<string, Emoji[]>) => {
         ]
 
         for (const emoji of group[1]) {
-            const alternates = emoji.alternates.map(alternate => {
-                return `\`${alternate.map(component => component.toString(16).padStart(4, '0').toUpperCase()).join('-')}\``
-            }).join(', ')
+            const src = emoji.mutant?.src.replace(']', '%5D').replace('[', '%5B').replace(/\s/g, '%20')
 
             groupMd.push([
-                `\`${emoji.codepoint.toString(16).padStart(4, '0').toUpperCase()}\``,
-                emoji.shortcodes.join(', '),
-                String.fromCodePoint(emoji.codepoint),
-                emoji.emoticons.join(', '),
-                alternates || '-',
-                emoji.mutantNames ? emoji.mutantNames.join(', ') : '-',
+                `[\`${emoji.codepoint}\`](https://emojipedia.org/search/?q=${emoji.codepoint})`,
+                emoji.shortcodes.map(shortcode => `\`${shortcode}\``).join(', '),
+                emoji.codepoint.split('-').map(chunk => String.fromCodePoint(parseInt(chunk, 16))).join(''),
+                emoji.emoticons.map(emoticon => `\`${emoticon}\``).join(', ') || '',
+                emoji.alternates.length || '',
+                emoji.mutant ? `[${emoji.mutant.shortcode}](https://github.com/mutant-remix/assets/tree/master/svg/${src})` : '❌',
             ].join(' | '))
         }
 
