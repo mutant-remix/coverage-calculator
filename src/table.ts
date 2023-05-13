@@ -22,7 +22,7 @@ export default (data: Map<string, Emoji[]>) => {
                 (emoji.alternates.length > 0 ? ` + ${emoji.alternates.length}` : ''),
                 emoji.shortcodes.map(shortcode => `\`${shortcode}\``).join(', '),
                 emoji.codepoint.split('-').map(chunk => String.fromCodePoint(parseInt(chunk, 16))).join(''),
-                emoji.mutant ? `[${emoji.mutant.shortcode}](https://github.com/mutant-remix/assets/tree/master/svg/${src})` : '❌',
+                emoji.mutant ? `[${emoji.mutant.shortcode}](https://github.com/mutant-remix/mutant-remix/tree/master/assets/svg/${src})` : '❌',
             ].join(' | '))
         }
 
