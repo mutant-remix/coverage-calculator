@@ -1,5 +1,4 @@
-# Not worthy of git
-node_modules/
-dist/
-data/
-out/
+/node_modules/
+/dist/
+/out/
+/data/

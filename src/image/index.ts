@@ -1,17 +1,17 @@
-import { logger } from '.'
+import { logger } from '..'
 import { readFileSync, writeFileSync, mkdirSync } from 'fs'
-import { CoverageData } from './types'
+import { CoverageData } from '../types'
 import { Resvg } from '@resvg/resvg-js'
 
 export default async (data: CoverageData) => {
-    const baseSvg = readFileSync('./src/base_coverage.svg', 'utf8')
+    const baseSvg = readFileSync('./src/image/base_coverage.svg', 'utf8')
 
     mkdirSync('./out', { recursive: true })
 
     const svg = baseSvg
         .replace('${missing}', data.coverage.mutantMissing.toString())
         .replace('${satisfied}', data.coverage.mutantSatisfied.toString())
-        .replace('${progress}', (data.coverage.satisfiedPercentage * 1.95).toString())
+        .replace('${progress}', (data.coverage.satisfiedPercentage * 2.5).toString())
 
     writeFileSync('./out/coverage.svg', svg)
     logger.done('Wrote svg to ./out/coverage.svg')
@@ -22,7 +22,10 @@ export default async (data: CoverageData) => {
             value: 2048,
         },
         font: {
-            fontFiles: [ './data/inter.ttf' ],
+            fontFiles: [
+                './src/image/Barlow-Bold.ttf',
+                './src/image/Barlow-ExtraBold.ttf',
+            ],
             loadSystemFonts: false,
         },
     })
